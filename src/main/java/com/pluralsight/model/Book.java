@@ -3,6 +3,7 @@ package com.pluralsight.model;
 import java.util.Date;
 
 public record Book(
+        long id,
         String isbn,
         String book_title,
         String author,
@@ -14,20 +15,25 @@ public record Book(
         String format,
         String avail_format,
         float price,
-        float rating) {
-
+        float rating,
+        String coverUrl) {
     public static class Builder {
+        long id;
         String isbn;
-        String book_title, author, genre, publisher, language, format, avail_format;
+        String book_title, author, genre, publisher, language, format, avail_format, coverUrl;
         Date publication_date;
         int page_count;
         float price, rating;
 
-        public Builder id(String isbn){
+        public Builder id(long id){
+            this.id = id;
+            return this;
+        }
+        public Builder isbn(String isbn){
             this.isbn = isbn;
             return this;
         }
-        public Builder title(String book_title) {
+        public Builder book_title(String book_title) {
             this.book_title = book_title;
             return this;
         }
@@ -36,7 +42,7 @@ public record Book(
             return this;
         }
         public Builder genre(String genre) {
-            this.book_title = book_title;
+            this.genre = genre;
             return this;
         }
         public Builder publication_date(Date publication_date){
@@ -71,9 +77,14 @@ public record Book(
             this.rating = rating;
             return this;
         }
+        public Builder coverUrl(String coverUrl){
+            this.coverUrl = coverUrl;
+            return this;
+        }
 
         public Book build(){
             return new Book(
+                    this.id,
                     this.isbn,
                     this.book_title,
                     this.author,
@@ -85,7 +96,9 @@ public record Book(
                     this.format,
                     this.avail_format,
                     this.price,
-                    this.rating);
+                    this.rating,
+                    this.coverUrl
+            );
         }
 
     }

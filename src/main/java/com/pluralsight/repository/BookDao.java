@@ -11,8 +11,24 @@ import java.util.Optional;
 public class BookDao extends AbstractDAO implements DAO<Book>{
 
     @Override
-    public Optional<Book> findById(long id) {
-        return Optional.empty();
+    public Optional<Book> findById(String isbn) {
+        Optional<Book> book = Optional.empty();
+        String sql = "SELECT * FROM BOOK WHERE isbn = ?";
+        try(
+            Connection conn = getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            ) {
+                preparedStatement.setString(1, isbn);
+                try (ResultSet rst = preparedStatement.executeQuery();){
+                    if (rst.next()){
+                        book = Optional.of(aBook(rst));
+                    }
+                }
+        } catch (SQLException e) {
+        e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return book;
     }
 
     @Override
@@ -61,6 +77,7 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
         }
         return books;
     }
+
     @Override
     public Optional<Book>  findBook(String book) {
         String sql = "SELECT * FROM BOOK WHERE book_title = ?";
@@ -75,7 +92,7 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
                     ResultSet resultSet = prepStmt.executeQuery()
             ){
                 if (resultSet.next()) {
-                    return Optional.ofNullable(inputBook(resultSet));
+                    return Optional.ofNullable(aBook(resultSet));
                 }
             }
         } catch (SQLException sqe) {
@@ -138,6 +155,79 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
         }
         return books;
     }
+    public boolean existsByIsbn(String isbn) {
+        String sql = "SELECT 1 FROM BOOK WHERE isbn = ?";
+        try (
+                Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, isbn);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // returns true if any row exists
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Book create(Book b) {
+        Book book = b;
+        java.util.Date utilDate = book.publication_date();
+        String sql =
+                "INSERT INTO BOOK (isbn, book_title, author, genre, publication_date, publisher, page_count, language, format, avail_format, price, rating, book_cover)" +
+                " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (
+                Connection connection = getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ) {
+            preparedStatement.setString(1, book.isbn());
+            preparedStatement.setString(2, book.book_title());
+            preparedStatement.setString(3, book.author());
+            preparedStatement.setString(4, book.genre());
+            if (utilDate != null) {
+                preparedStatement.setDate(5, new java.sql.Date(utilDate.getTime()));
+            } else {
+                preparedStatement.setDate(5, null);
+            }
+            preparedStatement.setString(6, book.publisher());
+            preparedStatement.setInt(7, book.page_count());
+            preparedStatement.setString(8, book.language());
+            preparedStatement.setString(9, book.format());
+            preparedStatement.setString(10, book.avail_format());
+            preparedStatement.setDouble(11, book.price());
+            preparedStatement.setDouble(12, book.rating());
+            preparedStatement.setString(13, book.coverUrl());
+            preparedStatement.executeUpdate();
+            try (ResultSet genKeys = preparedStatement.getGeneratedKeys()){
+                if (genKeys.next()) {
+                    long generatedId = genKeys.getLong(1);
+
+                    book = new Book.Builder()
+                            .id(generatedId)
+                            .isbn(b.isbn())
+                            .book_title(b.book_title())
+                            .author(b.author())
+                            .genre(b.genre())
+                            .publication_date(b.publication_date())
+                            .publisher(b.publisher())
+                            .page_count(b.page_count())
+                            .language(b.language())
+                            .format(b.format())
+                            .avail_format(b.avail_format())
+                            .price(b.price())
+                            .rating(b.rating())
+                            .coverUrl(b.coverUrl())
+                            .build();
+                }
+            }
+        } catch (SQLException sqe) {
+            sqe.printStackTrace();
+            throw new RuntimeException(sqe);
+        }
+        return book;
+    }
 
     @Override
     public void save(Book book) {
@@ -154,10 +244,12 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
 
     }
 
-    public Book inputBook(ResultSet resultSet) throws SQLException {
-            return new Book.Builder()
-                            .id(resultSet.getString("isbn"))
-                            .title(resultSet.getString("book_title"))
+    public Book aBook(ResultSet resultSet) throws SQLException {
+            return
+                    new Book.Builder()
+                            .id(resultSet.getLong("id"))
+                            .isbn(resultSet.getString("isbn"))
+                            .book_title(resultSet.getString("book_title"))
                             .author(resultSet.getString("author"))
                             .genre(resultSet.getString("genre"))
                             .publication_date(resultSet.getDate("publication_date"))
@@ -168,26 +260,12 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
                             .avail_format(resultSet.getString("avail_format"))
                             .price(resultSet.getFloat("price"))
                             .rating(resultSet.getFloat("rating"))
+                            .coverUrl(resultSet.getString("book_cover"))
                             .build();
-
     }
     public void inputBooks(List<Book> books, ResultSet resultSet) throws SQLException {
         while(resultSet.next()){
-            Book book =
-                    new Book.Builder()
-                            .id(resultSet.getString("isbn"))
-                            .title(resultSet.getString("book_title"))
-                            .author(resultSet.getString("author"))
-                            .genre(resultSet.getString("genre"))
-                            .publication_date(resultSet.getDate("publication_date"))
-                            .publisher(resultSet.getString("publisher"))
-                            .page_count(resultSet.getInt("page_count"))
-                            .language(resultSet.getString("language"))
-                            .format(resultSet.getString("format"))
-                            .avail_format(resultSet.getString("avail_format"))
-                            .price(resultSet.getFloat("price"))
-                            .rating(resultSet.getFloat("rating"))
-                            .build();
+            Book book = aBook(resultSet);
             books.add(book);
         }
     }
