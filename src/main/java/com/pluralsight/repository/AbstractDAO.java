@@ -1,10 +1,13 @@
 package com.pluralsight.repository;
 
+import com.pluralsight.model.Book;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Optional;
 
-public class AbstractDAO {
+public abstract class AbstractDAO {
     // DAO = Data Access Object
     // it is a pattern used to separate the data persistence logic in a separate layer
 
