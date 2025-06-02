@@ -247,20 +247,20 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
     public Book aBook(ResultSet resultSet) throws SQLException {
             return
                     new Book.Builder()
-                            .id(resultSet.getLong("id"))
-                            .isbn(resultSet.getString("isbn"))
-                            .book_title(resultSet.getString("book_title"))
-                            .author(resultSet.getString("author"))
-                            .genre(resultSet.getString("genre"))
-                            .publication_date(resultSet.getDate("publication_date"))
-                            .publisher(resultSet.getString("publisher"))
-                            .page_count(resultSet.getInt("page_count"))
-                            .language(resultSet.getString("language"))
-                            .format(resultSet.getString("format"))
-                            .avail_format(resultSet.getString("avail_format"))
-                            .price(resultSet.getFloat("price"))
-                            .rating(resultSet.getFloat("rating"))
-                            .coverUrl(resultSet.getString("book_cover"))
+                            .id(resultSet.getLong("id")) // 1
+                            .isbn(resultSet.getString("isbn")) // 2
+                            .book_title(resultSet.getString("book_title")) // 3
+                            .author(resultSet.getString("author")) // 4
+                            .genre(resultSet.getString("genre")) // 5
+                            .publication_date(resultSet.getDate("publication_date")) // 6
+                            .publisher(resultSet.getString("publisher")) // 7
+                            .page_count(resultSet.getInt("page_count")) // 8
+                            .language(resultSet.getString("language")) // 9
+                            .format(resultSet.getString("format")) // 10
+                            .avail_format(resultSet.getString("avail_format")) // 11
+                            .price(resultSet.getFloat("price")) // 12
+                            .rating(resultSet.getFloat("rating")) // 13
+                            .coverUrl(resultSet.getString("book_cover")) // 14
                             .build();
     }
     public void inputBooks(List<Book> books, ResultSet resultSet) throws SQLException {

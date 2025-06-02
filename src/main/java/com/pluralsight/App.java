@@ -7,6 +7,8 @@ import com.pluralsight.repository.DAO;
 import javax.xml.crypto.Data;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +55,7 @@ public class App {
             String isbn, String title, String author, String genre, String date,
             String publisher, int pages, String lang, String format, String other_format, float price, float rate
     ){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date pubDate;
         try {
             pubDate = sdf.parse(date);
@@ -141,7 +143,7 @@ public class App {
         App app = new App();
         app.addNewBook(
                 "074753849-2", "Harry Potter and the Chamber of Secrets","J. K. Rowling", "fantasy",
-                "02/07/1998", "Bloomsburry", 251, "english", "Hardback", "eBook",
+                "1998-07-02", "Bloomsburry", 251, "english", "Hardback", "eBook",
                 7.99f, 9.4f);
         app.displayBooks(app.groupByAuthor("J. K. Rowling"));
 //        app.displayBooks(app.bookDao.findAll());
