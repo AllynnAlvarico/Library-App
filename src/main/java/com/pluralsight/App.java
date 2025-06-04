@@ -162,14 +162,14 @@ public class App {
     }
 
     public void exampleUsage(){
-//        App app = new App();
+        App app = new App();
 //        Example usage:
 //        app.findAuthor("Ursa ShingField");
 //        app.bookDao.displayBooks(app.findByGenre("fantasy"));
 //        app.bookDao.displayBooks(app.findByRating(10));
 //        app.getBookByTitle("Eggs");
 //        app.getBookByIsbn("397164487-2");
-//        app.displayBooks(app.bookDao.findAll());
+        app.displayBooks(app.bookDao.findAll());
 //        app.newBook();
         //        app.addNewBook(
 //                "074753849-2", "Harry Potter and the Chamber of Secrets","J. K. Rowling", "fantasy",
@@ -184,5 +184,7 @@ public class App {
     }
     public static void main(String[] args) {
         App app = new App();
+
+        app.exampleUsage();
     }
 }   

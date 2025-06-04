@@ -32,25 +32,38 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
     }
 
     @Override
-    public List<Book> findAll() {
+    public List<Book> findAll(){
         List<Book> books = Collections.emptyList();
-        String sql = "SELECT * FROM BOOK";
-        try(
-                // Auto-Closeable resource
-                Connection conn = getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet resultSet = stmt.executeQuery(sql);
-        ) {
-            books = new ArrayList<>();
-            inputBooks(books, resultSet);
-        } catch (SQLException sqe) {
-            sqe.printStackTrace();
-        } finally {
-            System.out.println("Retrieving Books Done");
-            System.out.println("Books Found " + books.size());
-        }
+        JdbcQueryTemplate<Book> template = new JdbcQueryTemplate<Book>() {
+            @Override
+            public Book mapItem(ResultSet resultSet) throws SQLException {
+                return aBook(resultSet);
+            }
+        };
+        books = template.queryForList("SELECT * FROM BOOK");
         return books;
     }
+
+//    @Override
+//    public List<Book> findAll() {
+//        List<Book> books = Collections.emptyList();
+//        String sql = "SELECT * FROM BOOK";
+//        try(
+//                // Auto-Closeable resource
+//                Connection conn = getConnection();
+//                Statement stmt = conn.createStatement();
+//                ResultSet resultSet = stmt.executeQuery(sql);
+//        ) {
+//            books = new ArrayList<>();
+//            inputBooks(books, resultSet);
+//        } catch (SQLException sqe) {
+//            sqe.printStackTrace();
+//        } finally {
+//            System.out.println("Retrieving Books Done");
+//            System.out.println("Books Found " + books.size());
+//        }
+//        return books;
+//    }
 
     @Override
     public List<Book> findByGenre(String inputGenre) {
