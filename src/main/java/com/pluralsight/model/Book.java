@@ -2,21 +2,9 @@ package com.pluralsight.model;
 
 import java.util.Date;
 
-public record Book(
-        long id,
-        String isbn,
-        String book_title,
-        String author,
-        String genre,
-        Date publication_date,
-        String publisher,
-        int page_count,
-        String language,
-        String format,
-        String avail_format,
-        float price,
-        float rating,
-        String coverUrl) {
+public record Book(long id, String isbn, String book_title, String author, String genre, Date publication_date,
+        String publisher, int page_count, String language, String format, String avail_format,
+                   float price, float rating, String coverUrl) {
     public static class Builder {
         long id;
         String isbn;
@@ -100,6 +88,24 @@ public record Book(
                     this.coverUrl
             );
         }
+        public static Builder from(Book book) {
+            return new Builder()
+                    .id(book.id())
+                    .isbn(book.isbn())
+                    .book_title(book.book_title())
+                    .author(book.author())
+                    .genre(book.genre())
+                    .publication_date(book.publication_date())
+                    .publisher(book.publisher())
+                    .page_count(book.page_count())
+                    .language(book.language())
+                    .format(book.format())
+                    .avail_format(book.avail_format())
+                    .price(book.price())
+                    .rating(book.rating())
+                    .coverUrl(book.coverUrl());
+        }
+
 
     }
 

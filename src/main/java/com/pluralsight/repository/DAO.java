@@ -16,8 +16,10 @@ public interface DAO<T> {
     boolean existsByIsbn(String isbn);
     T create(T t);
     void save(T t);
-    void update(T t, String[] params);
-    void delete(T t);
+    T update(T t);
+    int[] update(List<T> t);
+    int delete(T t);
+    int delete(List<T> t);
 
 
 }

@@ -235,13 +235,83 @@ public class BookDao extends AbstractDAO implements DAO<Book>{
     }
 
     @Override
-    public void update(Book book, String[] params) {
+    public Book update(Book book) {
+        String sql = "UPDATE Book SET book_title = ? WHERE id = ?";
+        try (
+                Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setString(1, book.book_title());
+            pstmt.setLong(2, book.id());
+            pstmt.executeUpdate();
 
+        } catch (SQLException sqe) {
+            sqe.printStackTrace();
+            throw new RuntimeException(sqe);
+        }
+        return null;
     }
 
     @Override
-    public void delete(Book book) {
+    public int[] update(List<Book> books) {
+        int [] records = {};
+        String sql = "UPDATE Book SET book_title = ?, rating = ? WHERE id = ?";
+        try (
+                Connection connection = getConnection();
+                PreparedStatement pst = connection.prepareStatement(sql);
+                ) {
+            for (Book book : books) {
+                pst.setString(1, book.book_title());
+                pst.setFloat(2, book.rating());
+                pst.setLong(3, book.id());
 
+                pst.addBatch();
+            }
+            records = pst.executeBatch();
+        } catch (SQLException sqe) {
+            sqe.printStackTrace();
+            throw new RuntimeException(sqe);
+        }
+        return records;
+    }
+
+
+    @Override
+    public int delete(Book book) {
+        int rowsAffected = 0;
+        String sql = "DELETE FROM Book WHERE id = ?";
+        try (
+                Connection connection = getConnection();
+                PreparedStatement pst = connection.prepareStatement(sql);
+        ) {
+            pst.setLong(1, book.id());
+            rowsAffected = pst.executeUpdate();
+
+        } catch (SQLException sqe) {
+            sqe.printStackTrace();
+            throw new RuntimeException(sqe);
+        }
+        return rowsAffected;
+    }
+    public int delete(List<Book> books) {
+        int [] records = {};
+        int numberOfAffectedRows = records.length;
+        String sql = "DELETE FROM Book WHERE id = ?";
+        try (
+                Connection connection = getConnection();
+                PreparedStatement pst = connection.prepareStatement(sql);
+        ) {
+            for (Book book : books) {
+                pst.setLong(1, book.id());
+
+                pst.addBatch();
+            }
+            records = pst.executeBatch();
+        } catch (SQLException sqe) {
+            sqe.printStackTrace();
+            throw new RuntimeException(sqe);
+        }
+        return numberOfAffectedRows;
     }
 
     public Book aBook(ResultSet resultSet) throws SQLException {
